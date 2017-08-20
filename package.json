@@ -1,0 +1,16 @@
+{
+  "name": "lc",
+  "version": "1.0.0",
+  "description": "LiteCoin Test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Niels Koster",
+  "license": "ISC",
+  "dependencies": {
+    "bitcoinjs-lib": "^3.1.1",
+    "browserify": "^14.4.0",
+    "uglify-js": "^3.0.28"
+  }
+}
