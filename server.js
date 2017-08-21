@@ -5,7 +5,7 @@
  console.error((new Date()) + ' Server cannot load');
  process.exit();
  });
- */
+*/
 
 const
     log = true,
@@ -25,6 +25,7 @@ if (process.argv.indexOf("-https") !== -1) {
 
 const server = https.createServer(options, function (req, res) {
     let postData = '';
+    let csrResponse = '';
     if (req.method === 'POST') {
         let body = '';
         req.on('data', function(chunk) {
@@ -32,9 +33,19 @@ const server = https.createServer(options, function (req, res) {
         });
         req.on('end', function() {
             postData = qs.parse(body);
-            if (log) console.log((new Date()) + ' ' + req.connection.remoteAddress + ' CSR: '+ postData.csr);
-//            res.writeHead(200);
-//            res.end(JSON.stringify(data));
+            if (log)
+                console.log((new Date()) + ' ' + req.connection.remoteAddress + ' CSR: ' + postData.csr);
+            const stream = fs.createWriteStream("/tmp/csr.pem");
+            stream.once('open', function() {
+                stream.write(postData.csr);
+                stream.end();
+            });
+            const { spawn } = require('child_process');
+            const openssl = spawn('cat', ['/tmp/csr.pem']);
+            openssl.stdout.on('data', (data) => {
+                csrResponse += data;
+            });
+            res.end(csrResponse);
         });
     }
     let
@@ -65,7 +76,7 @@ const server = https.createServer(options, function (req, res) {
             if (err) {
                 if (log) return console.log((new Date()) + ' ' + err);
             }
-            if (postData.csr) res.write(postData.csr);
+            if (postData.csr) res.write("<h4>CSR received.</h4>");
             res.end(data);
         });
     } else {
