@@ -27,8 +27,9 @@ const server = https.createServer(options, function (req, res) {
         });
         req.on('end', function() {
             postData = qs.parse(body);
-            if (log)
-                console.log((new Date()) + ' ' + req.connection.remoteAddress + ' CSR: ' + postData.csr);
+            if (log) console.log((new Date()) + ' ' +
+                req.connection.remoteAddress +
+                ' CSR: ' + postData.csr);
             fs.writeFileSync("/tmp/csr.pem", postData.csr);
             try {
                 csrResponse = require('child_process').execSync('openssl req -noout -text -in /tmp/csr.pem')
@@ -58,7 +59,8 @@ const server = https.createServer(options, function (req, res) {
         contentType = 'image/svg+xml'
     }
     if (fs.existsSync(fileToLoad)) {
-        if (log) console.log((new Date()) + ' ' + req.connection.remoteAddress + ' URI: ' +
+        if (log) console.log((new Date()) + ' ' +
+            req.connection.remoteAddress + ' URI: ' +
             fileToLoad + ' (' + contentType + ')');
         res.writeHeader(200, {"Content-Type": contentType});
         fs.readFile(fileToLoad, 'utf8', function (err, data) {
@@ -67,7 +69,9 @@ const server = https.createServer(options, function (req, res) {
             res.end(data);
         });
     } else {
-        if (log) console.log((new Date()) + ' ' + req.connection.remoteAddress + ' not found: ' + fileToLoad);
+        if (log) console.log((new Date()) + ' ' +
+            req.connection.remoteAddress +
+            ' not found: ' + fileToLoad);
         res.writeHeader(404, {"Content-Type": "text/html"});
         res.write("404 Not Found\n");
         res.end();
@@ -75,6 +79,7 @@ const server = https.createServer(options, function (req, res) {
 });
 
 server.listen(port_https, function () {
-    console.log((new Date()) + ' https server started at ' + host + ':' + port_https);
+    console.log((new Date()) +
+        ' https server started at ' +
+        host + ':' + port_https);
 });
-
