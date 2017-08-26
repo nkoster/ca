@@ -35,17 +35,12 @@ const server = https.createServer(options, function (req, res) {
             postData = qs.parse(body);
             if (log)
                 console.log((new Date()) + ' ' + req.connection.remoteAddress + ' CSR: ' + postData.csr);
-            const stream = fs.createWriteStream("/tmp/csr.pem");
-            stream.once('open', function() {
-                stream.write(postData.csr);
-                stream.end();
-            });
-            const { spawn } = require('child_process');
-            const openssl = spawn('cat', ['/tmp/csr.pem']);
-            openssl.stdout.on('data', (data) => {
-                csrResponse += data;
-            });
-            res.end(csrResponse);
+            fs.writeFileSync("/tmp/csr.pem", postData.csr);
+            try {
+                csrResponse = require('child_process').execSync('openssl req -noout -text -in /tmp/csr.pem')
+            } catch(err) {
+                csrResponse = 'error'
+            }
         });
     }
     let
@@ -73,11 +68,9 @@ const server = https.createServer(options, function (req, res) {
             fileToLoad + ' (' + contentType + ')');
         res.writeHeader(200, {"Content-Type": contentType});
         fs.readFile(fileToLoad, 'utf8', function (err, data) {
-            if (err) {
-                if (log) return console.log((new Date()) + ' ' + err);
-            }
-            if (postData.csr) res.write("<h4>CSR received.</h4>");
-            res.end(data);
+            if (err) return console.log((new Date()) + ' ' + err);
+            data = data.toString().replace('%%%csr%%%', '<pre>' + csrResponse + '</pre>');
+            res.end(data.toString());
         });
     } else {
         if (log) console.log((new Date()) + ' ' + req.connection.remoteAddress + ' not found: ' + fileToLoad);
@@ -90,3 +83,4 @@ const server = https.createServer(options, function (req, res) {
 server.listen(port_https, function () {
     console.log((new Date()) + ' https server started at ' + host + ':' + port_https);
 });
+
