@@ -17,8 +17,9 @@ if (process.argv.indexOf("-https") !== -1) {
 }
 
 const server = https.createServer(options, function (req, res) {
-    let postData = '';
-    let csrResponse = '';
+    let
+        postData = '',
+        csrResponse = '';
     if (req.method === 'POST') {
         let body = '';
         req.on('data', function(chunk) {
@@ -63,7 +64,7 @@ const server = https.createServer(options, function (req, res) {
         fs.readFile(fileToLoad, 'utf8', function (err, data) {
             if (err) return console.log((new Date()) + ' ' + err);
             data = data.toString().replace('%%%csr%%%', '<pre>' + csrResponse + '</pre>');
-            res.end(data.toString());
+            res.end(data);
         });
     } else {
         if (log) console.log((new Date()) + ' ' + req.connection.remoteAddress + ' not found: ' + fileToLoad);
