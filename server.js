@@ -1,12 +1,5 @@
 'use strict';
 
-/*
- process.on('uncaughtException', function (err) {
- console.error((new Date()) + ' Server cannot load');
- process.exit();
- });
-*/
-
 const
     log = true,
     host = 'localhost',
